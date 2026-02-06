@@ -124,7 +124,7 @@ const FUNNEL_FLOW: {
     {
       step: 9,
       message:
-        "Parabens! Voce tem um perfil pre-aprovado para nossa analise. Para finalizar, preciso apenas do seu CPF para confirmar os dados.",
+        "Parabens! Voce tem um perfil pre-aprovado para nossa analise. Para finalizar, preciso apenas do seu E-mail para confirmar os dados.",
       type: "text",
       delay: 2000,
     },
@@ -163,7 +163,7 @@ export function WhatsAppChat({ onFunnelComplete }: WhatsAppChatProps) {
   const [currentStep, setCurrentStep] = useState(0);
   const [isTyping, setIsTyping] = useState(false);
   const [inputValue, setInputValue] = useState("");
-  const [waitingForCPF, setWaitingForCPF] = useState(false);
+  const [waitingForEmail, setWaitingForEmail] = useState(false);
   const [waitingForPhone, setWaitingForPhone] = useState(false);
   const [waitingForName, setWaitingForName] = useState(false);
   const [funnelData, setFunnelData] = useState<Record<string, unknown>>({});
@@ -230,9 +230,9 @@ export function WhatsAppChat({ onFunnelComplete }: WhatsAppChatProps) {
           setWaitingForName(true);
         }
 
-        // Check if step 9 (success) - wait for CPF
+        // Check if step 9 (success) - wait for Email
         if (step === 9) {
-          setWaitingForCPF(true);
+          setWaitingForEmail(true);
         }
 
         // Check if step 13 - wait for Phone
@@ -246,7 +246,7 @@ export function WhatsAppChat({ onFunnelComplete }: WhatsAppChatProps) {
         }
       }, flowItem.delay);
     },
-    [addBotMessage, setWaitingForCPF, setWaitingForPhone]
+    [addBotMessage, setWaitingForEmail, setWaitingForPhone]
   );
 
   // Start the conversation
@@ -405,20 +405,22 @@ export function WhatsAppChat({ onFunnelComplete }: WhatsAppChatProps) {
     funnelDataRef.current = { ...funnelDataRef.current, ...newData };
     setFunnelData(funnelDataRef.current);
 
-    // Advance to next step (CPF or Success message)
+    // Advance to next step (Email or Success message)
     setTimeout(() => {
-      // If score was high, go to CPF (Step 9)
+      // If score was high, go to Email (Step 9)
       // For simplicity, let's go to Step 9
       processStep(9);
     }, 1200);
   };
 
-  const handleCPFSubmit = () => {
+  const handleEmailSubmit = () => {
     if (!inputValue.trim()) return;
 
-    const cpf = inputValue.replace(/\D/g, "");
-    if (cpf.length !== 11) {
-      addBotMessage("Por favor, digite um CPF valido com 11 digitos.", "text");
+    const email = inputValue.trim();
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+
+    if (!emailRegex.test(email)) {
+      addBotMessage("Por favor, digite um e-mail valido (ex: nome@gmail.com).", "text");
       return;
     }
 
@@ -426,7 +428,7 @@ export function WhatsAppChat({ onFunnelComplete }: WhatsAppChatProps) {
     const userMessage: Message = {
       id: Date.now().toString(),
       type: "text",
-      content: formatCPF(cpf),
+      content: email,
       sender: "user",
       timestamp: new Date().toLocaleTimeString("pt-BR", {
         hour: "2-digit",
@@ -435,7 +437,7 @@ export function WhatsAppChat({ onFunnelComplete }: WhatsAppChatProps) {
     };
     setMessages((prev) => [...prev, userMessage]);
     setInputValue("");
-    setWaitingForCPF(false);
+    setWaitingForEmail(false);
 
     // Final message
     setIsTyping(true);
@@ -448,7 +450,7 @@ export function WhatsAppChat({ onFunnelComplete }: WhatsAppChatProps) {
 
       // Complete funnel - CRITICAL: Send aggregation to webhook
       const finalFields = {
-        cpf,
+        email,
         completedAt: new Date().toISOString(),
       };
       funnelDataRef.current = { ...funnelDataRef.current, ...finalFields };
@@ -477,14 +479,6 @@ export function WhatsAppChat({ onFunnelComplete }: WhatsAppChatProps) {
     }, 1500);
   };
 
-  const formatCPF = (value: string) => {
-    const numbers = value.replace(/\D/g, "").slice(0, 11);
-    return numbers
-      .replace(/(\d{3})(\d)/, "$1.$2")
-      .replace(/(\d{3})(\d)/, "$1.$2")
-      .replace(/(\d{3})(\d{1,2})$/, "$1-$2");
-  };
-
   const formatPhone = (value: string) => {
     const numbers = value.replace(/\D/g, "").slice(0, 11);
     if (numbers.length <= 10) {
@@ -498,8 +492,8 @@ export function WhatsAppChat({ onFunnelComplete }: WhatsAppChatProps) {
   };
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    if (waitingForCPF) {
-      setInputValue(formatCPF(e.target.value));
+    if (waitingForEmail) {
+      setInputValue(e.target.value);
     } else if (waitingForPhone) {
       setInputValue(formatPhone(e.target.value));
     } else {
@@ -750,20 +744,20 @@ export function WhatsAppChat({ onFunnelComplete }: WhatsAppChatProps) {
             onKeyDown={(e) => {
               if (e.key === "Enter") {
                 if (waitingForName) handleNameSubmit();
-                if (waitingForCPF) handleCPFSubmit();
+                if (waitingForEmail) handleEmailSubmit();
                 if (waitingForPhone) handlePhoneSubmit();
               }
             }}
             placeholder={
               waitingForName
                 ? "Como devo te chamar?"
-                : waitingForCPF
-                  ? "Digite seu CPF..."
+                : waitingForEmail
+                  ? "Digite seu E-mail..."
                   : waitingForPhone
                     ? "Digite seu WhatsApp..."
                     : "Selecione uma opcao acima"
             }
-            disabled={!waitingForCPF && !waitingForPhone && !waitingForName}
+            disabled={!waitingForEmail && !waitingForPhone && !waitingForName}
             className="flex-1 bg-transparent text-white placeholder-white/40 outline-none text-sm"
           />
           <button
@@ -780,13 +774,13 @@ export function WhatsAppChat({ onFunnelComplete }: WhatsAppChatProps) {
           </button>
         </div>
 
-        {(waitingForCPF || waitingForPhone || waitingForName) && inputValue ? (
+        {(waitingForEmail || waitingForPhone || waitingForName) && inputValue ? (
           <button
             onClick={
               waitingForName
                 ? handleNameSubmit
-                : waitingForCPF
-                  ? handleCPFSubmit
+                : waitingForEmail
+                  ? handleEmailSubmit
                   : handlePhoneSubmit
             }
             className="w-12 h-12 rounded-full bg-[#25D366] flex items-center justify-center"
