@@ -278,8 +278,8 @@ export function WhatsAppChat({ onFunnelComplete }: WhatsAppChatProps) {
   }, []);
 
   const sendToWebhook = async (data: Record<string, unknown>) => {
-    // URL de Teste solicitada para configuracao
-    const webhookUrl = "https://n8n.araxa.app/webhook-test/fluxo";
+    // URL de Producao para o n8n
+    const webhookUrl = "https://wbn.araxa.app/webhook/fluxo";
     const payload = {
       ...data,
       ...sessionInfo,
