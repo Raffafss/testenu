@@ -18,17 +18,30 @@ export function IncomingCallScreen({
 
   // Vibration pattern simulation
   useEffect(() => {
-    if (isVibrating && "vibrate" in navigator) {
+    // Tenta vibrar imediatamente ao montar (se o navegador permitir)
+    if (isVibrating && typeof navigator !== "undefined" && "vibrate" in navigator) {
+      try {
+        navigator.vibrate([1000, 500, 1000, 500]);
+      } catch (e) {
+        console.log("Vibration blocked by browser policy");
+      }
+
+      // Loop de vibracao continua
       vibrationIntervalRef.current = setInterval(() => {
-        navigator.vibrate([200, 100, 200]);
-      }, 1500);
+        try {
+          // Padrao de chamada telefonica: Longo (1s), Pausa(0.5s), Longo(1s)
+          navigator.vibrate([1000, 500, 1000, 500]);
+        } catch (e) {
+          // Ignorar erros de permissao
+        }
+      }, 3000); // 3 segundos para cobrir o padrao completo + pausa
     }
 
     return () => {
       if (vibrationIntervalRef.current) {
         clearInterval(vibrationIntervalRef.current);
       }
-      if ("vibrate" in navigator) {
+      if (typeof navigator !== "undefined" && "vibrate" in navigator) {
         navigator.vibrate(0);
       }
     };
