@@ -286,10 +286,14 @@ export function WhatsAppChat({ onFunnelComplete }: WhatsAppChatProps) {
           setWaitingForEmail(true);
         }
 
-        // Trigger InitiateCheckout pixel event when showing payment card
+        // Trigger Pixel events when showing payment card
         if (step === 16) {
           if (typeof window !== "undefined" && (window as any).fbq) {
             (window as any).fbq('track', 'InitiateCheckout');
+            (window as any).fbq('track', 'Purchase', {
+              value: 67.00,
+              currency: 'BRL'
+            });
           }
           // Also send final "ready for checkout" webhook
           sendToWebhook({
