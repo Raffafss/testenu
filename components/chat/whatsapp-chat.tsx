@@ -159,7 +159,7 @@ const FUNNEL_FLOW: {
     },
     {
       step: 14,
-      message: "Infelizmente não conseguimos oferecer uma oferta para seu score no momento. Porém um dos nossos consultores vai te mostrar como subir 150 pontos em uma semana, você tem interesse?",
+      message: "Infelizmente não foi apresentado nenhuma oferta de empréstimo para essa pontuação. Um de nossos consultores consegue te guiar para alcançar 50 pontos essa semana e validar o empréstimo para você. É do seu interesse continuar ?",
       type: "options",
       options: ["SIM"],
       delay: 1500,
@@ -167,7 +167,7 @@ const FUNNEL_FLOW: {
     },
     {
       step: 15,
-      message: "Certo, o nosso consultor cobra 67,00 para fazer uma análise completa do seu nome e te passar todas as ações necessárias para que você consiga subir os pontos necessários para aprovar o empréstimo. Deseja continuar ?",
+      message: "Nosso consultor cobra o valor de *R$67,00* para fazer uma análise completa do seu nome e te passar todas as ações necessárias para que você consiga subir os pontos necessários para aprovar o empréstimo ainda essa semana. Deseja continuar ?",
       type: "options",
       options: ["SIM"],
       delay: 1500,
