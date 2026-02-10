@@ -820,7 +820,7 @@ export function WhatsAppChat({ onFunnelComplete }: WhatsAppChatProps) {
                 ) : (
                   <>
                     <div className="text-sm whitespace-pre-line">
-                      {message.content.split(/(\*\*\[.+?\]\(.+?\)\*\*|\[.+?\]\(.+?\)|https?:\/\/[^\s]+)/g).map((part, i) => {
+                      {message.content.split(/(\*\*\[.+?\]\(.+?\)\*\*|\[.+?\]\(.+?\)|https?:\/\/[^\s]+|\*[^*]+\*)/g).map((part, i) => {
                         const mdLinkMatch = part.match(/\**\[(.+?)\]\((.+?)\)\**/);
                         if (mdLinkMatch) {
                           return (
@@ -848,6 +848,10 @@ export function WhatsAppChat({ onFunnelComplete }: WhatsAppChatProps) {
                               {urlMatch[1]}
                             </a>
                           );
+                        }
+                        const boldMatch = part.match(/^\*(.+?)\*$/);
+                        if (boldMatch) {
+                          return <strong key={i} className="font-bold">{boldMatch[1]}</strong>;
                         }
                         return part;
                       })}
