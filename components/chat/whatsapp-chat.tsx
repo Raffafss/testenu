@@ -175,7 +175,7 @@ const FUNNEL_FLOW: {
     },
     {
       step: 16,
-      message: "Ótimo, muito bom ver que você realmente quer um empréstimo, para começar hoje a subir seu score, efetue o pagamento abaixo \n\nLembrando que nosso consultor não consegue atender a todos que comprarem, então se você ainda visualiza essa oferta, saiba que está disponível, mas assim que encerrar as 12 vagas restantes será fechado essa consultoria.",
+      message: "Ótimo, muito bom ver que você realmente quer um empréstimo, para começar hoje a subir seu score, efetue o pagamento abaixo \n\nLembrando que nosso consultor não consegue atender a todos que comprarem, então se você ainda visualiza essa oferta, saiba que está disponível, mas assim que encerrar as *12 vagas restantes* será fechado essa consultoria.",
       type: "text",
       delay: 1500,
     },
@@ -204,6 +204,7 @@ export function WhatsAppChat({ onFunnelComplete }: WhatsAppChatProps) {
   const [waitingForPhone, setWaitingForPhone] = useState(false);
   const [waitingForName, setWaitingForName] = useState(false);
   const [waitingForScore, setWaitingForScore] = useState(false);
+  const [showCheckoutCard, setShowCheckoutCard] = useState(false);
   const [funnelData, setFunnelData] = useState<Record<string, unknown>>({});
   const funnelDataRef = useRef<Record<string, unknown>>({});
   const [isPlayingAudio, setIsPlayingAudio] = useState(false);
@@ -290,6 +291,7 @@ export function WhatsAppChat({ onFunnelComplete }: WhatsAppChatProps) {
 
         // Trigger Pixel events when showing payment card
         if (step === 16) {
+          setShowCheckoutCard(true);
           if (typeof window !== "undefined" && (window as any).fbq) {
             (window as any).fbq('track', 'InitiateCheckout');
             (window as any).fbq('track', 'Purchase', {
@@ -918,7 +920,7 @@ export function WhatsAppChat({ onFunnelComplete }: WhatsAppChatProps) {
         </div>
 
         {/* Native Checkout Card */}
-        {currentStep === 16 && (
+        {showCheckoutCard && (
           <div className="mt-4 px-2 pb-6 animate-in fade-in slide-in-from-bottom-4 duration-1000">
             <div className="bg-[#1f2c34] rounded-2xl overflow-hidden shadow-2xl border border-[#25D366]/20">
               {/* Header */}
@@ -931,10 +933,7 @@ export function WhatsAppChat({ onFunnelComplete }: WhatsAppChatProps) {
                   </div>
                   <span className="text-white font-semibold">Pagamento Seguro</span>
                 </div>
-                <div className="flex -space-x-2">
-                  <div className="w-8 h-8 rounded-full bg-white p-1 shadow-sm border border-white/10 ring-2 ring-[#2a3942]">
-                    <img src="https://logopng.com.br/logos/mercado-pago-81.png" alt="Mercado Pago" className="w-full h-full object-contain" />
-                  </div>
+                <div className="flex">
                   <div className="w-8 h-8 rounded-full bg-white p-1 shadow-sm border border-white/10 ring-2 ring-[#2a3942]">
                     <img src="https://logopng.com.br/logos/pix-106.png" alt="PIX" className="w-full h-full object-contain" />
                   </div>
