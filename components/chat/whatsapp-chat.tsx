@@ -167,7 +167,7 @@ const FUNNEL_FLOW: {
     },
     {
       step: 15,
-      message: "Nosso consultor cobra the valor de *R$67,00* para fazer uma análise completa do seu nome e te passar todas as ações necessárias para que você consiga subir os pontos aprovando o empréstimo ainda essa semana. É o que você deseja?",
+      message: "Nosso consultor cobra o valor de *R$67,00* para fazer uma análise completa do seu nome e te passar todas as ações necessárias para que você consiga subir os pontos aprovando o empréstimo ainda essa semana. É o que você deseja?",
       type: "options",
       options: ["SIM"],
       delay: 1500,
