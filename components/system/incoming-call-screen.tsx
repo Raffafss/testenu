@@ -140,8 +140,12 @@ export function IncomingCallScreen({
           <div className="absolute inset-0 w-32 h-32 rounded-full bg-green-500/20 animate-ring-wave-delay" />
 
           {/* Main avatar circle */}
-          <div className="relative w-32 h-32 rounded-full bg-gradient-to-br from-zinc-700 to-zinc-800 flex items-center justify-center animate-ring-pulse border-2 border-zinc-600">
-            <Phone className="w-12 h-12 text-white" />
+          <div className="relative w-32 h-32 rounded-full overflow-hidden flex items-center justify-center animate-ring-pulse border-2 border-zinc-600">
+            <img
+              src="/audio/qwen-image-edit_a_Preciso_que_replique.png"
+              alt="Atendimento"
+              className="w-full h-full object-cover"
+            />
           </div>
         </div>
 

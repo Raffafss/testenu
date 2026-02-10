@@ -105,13 +105,13 @@ const FUNNEL_FLOW: {
       step: 7,
       message: "Qual e o valor do seu score?",
       type: "options",
-      options: ["Menos de 400", "400 a 600", "600 a 800", "Acima de 800"],
+      options: ["Menos de 400", "400 a 699", "700 a 850", "Acima de 850"],
       delay: 1000,
       nextStep: {
-        "Menos de 400": 10,
-        "400 a 600": 13,
-        "600 a 800": 13,
-        "Acima de 800": 13,
+        "Menos de 400": 14,
+        "400 a 699": 14,
+        "700 a 850": 13,
+        "Acima de 850": 13,
       },
     },
     {
@@ -155,6 +155,28 @@ const FUNNEL_FLOW: {
       message: "Para darmos continuidade, qual o melhor número de WhatsApp para falarmos com você?",
       type: "text",
       delay: 1200,
+    },
+    {
+      step: 14,
+      message: "Infelizmente não conseguimos oferecer uma oferta para seu score no momento. Porém um dos nossos consultores vai te mostrar como subir 150 pontos em uma semana, você tem interesse?",
+      type: "options",
+      options: ["SIM"],
+      delay: 1500,
+      nextStep: { "SIM": 15 },
+    },
+    {
+      step: 15,
+      message: "Certo, o nosso consultor cobra 67,00 para fazer uma análise completa do seu nome e te passar todas as ações necessárias para que você consiga subir os pontos necessários para aprovar o empréstimo. Deseja continuar ?",
+      type: "options",
+      options: ["SIM"],
+      delay: 1500,
+      nextStep: { "SIM": 16 },
+    },
+    {
+      step: 16,
+      message: "Ótimo, muito bom ver que você realmente quer um empréstimo, para começar hoje a subir seu score, efetue o pagamento abaixo \n\nLembrando que nosso consultor não consegue atender a todos que comprarem, então se você ainda visualiza essa oferta, saiba que está disponível, mas assim que encerrar as 12 vagas restantes será fechado essa consultoria.",
+      type: "text",
+      delay: 1500,
     }
   ];
 
@@ -584,14 +606,14 @@ export function WhatsAppChat({ onFunnelComplete }: WhatsAppChatProps) {
 
         <div className="w-10 h-10 rounded-full overflow-hidden bg-zinc-700">
           <img
-            src="/placeholder.svg"
-            alt="Titia Dark"
+            src="/audio/imagem.jpg"
+            alt="Fernanda Moretto"
             className="w-full h-full object-cover"
           />
         </div>
 
         <div className="flex-1 ml-2">
-          <h1 className="text-white font-medium text-base">Titia Dark</h1>
+          <h1 className="text-white font-medium text-base">Fernanda Moretto</h1>
           <p className="text-[#25D366] text-xs">online</p>
         </div>
 
@@ -728,6 +750,76 @@ export function WhatsAppChat({ onFunnelComplete }: WhatsAppChatProps) {
 
           <div ref={messagesEndRef} />
         </div>
+
+        {/* Native Checkout Card */}
+        {currentStep === 16 && (
+          <div className="mt-4 px-2 pb-6 animate-in fade-in slide-in-from-bottom-4 duration-1000">
+            <div className="bg-[#1f2c34] rounded-2xl overflow-hidden shadow-2xl border border-[#25D366]/20">
+              {/* Header */}
+              <div className="p-4 bg-[#2a3942] border-b border-white/5 flex items-center justify-between">
+                <div className="flex items-center gap-2">
+                  <div className="p-1.5 bg-[#25D366]/10 rounded-lg">
+                    <svg className="w-5 h-5 text-[#25D366]" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z" />
+                    </svg>
+                  </div>
+                  <span className="text-white font-semibold">Pagamento Seguro</span>
+                </div>
+                <div className="flex -space-x-2">
+                  <div className="w-8 h-8 rounded-full bg-white p-1 shadow-sm border border-white/10 ring-2 ring-[#2a3942]">
+                    <img src="https://logopng.com.br/logos/mercado-pago-81.png" alt="Mercado Pago" className="w-full h-full object-contain" />
+                  </div>
+                  <div className="w-8 h-8 rounded-full bg-white p-1 shadow-sm border border-white/10 ring-2 ring-[#2a3942]">
+                    <img src="https://logopng.com.br/logos/pix-106.png" alt="PIX" className="w-full h-full object-contain" />
+                  </div>
+                </div>
+              </div>
+
+              {/* Content */}
+              <div className="p-6 space-y-4">
+                <div className="space-y-1">
+                  <h3 className="text-[#25D366] text-xs font-bold uppercase tracking-wider">Você está adquirindo:</h3>
+                  <p className="text-white text-lg font-medium leading-tight">Análise Completa + Guia: Como subir 150 pontos em 1 semana</p>
+                </div>
+
+                <div className="flex items-baseline gap-2">
+                  <span className="text-white/40 text-sm line-through">R$ 197,00</span>
+                  <span className="text-white text-3xl font-bold">R$ 67,00</span>
+                  <span className="text-[#25D366] text-[10px] font-bold bg-[#25D366]/10 px-2 py-0.5 rounded uppercase">Oferta Única</span>
+                </div>
+
+                <div className="space-y-2">
+                  <div className="flex items-center gap-2 text-white/70 text-sm">
+                    <Check className="w-4 h-4 text-[#25D366]" />
+                    <span>Acesso imediato após o pagamento</span>
+                  </div>
+                  <div className="flex items-center gap-2 text-white/70 text-sm">
+                    <Check className="w-4 h-4 text-[#25D366]" />
+                    <span>Consultoria individual garantida</span>
+                  </div>
+                </div>
+
+                <button
+                  onClick={() => window.open('https://mpago.la/2QgNabP', '_blank')}
+                  className="w-full py-4 bg-[#25D366] hover:bg-[#20bd5b] text-[#0b141a] font-bold rounded-xl shadow-[0_0_20px_rgba(37,211,102,0.3)] transition-all transform active:scale-[0.98] flex items-center justify-center gap-2 group"
+                >
+                  <span>PAGAR AGORA NO MERCADO PAGO</span>
+                  <svg className="w-5 h-5 transition-transform group-hover:translate-x-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M14 5l7 7m0 0l-7 7m7-7H3" />
+                  </svg>
+                </button>
+              </div>
+
+              {/* Footer */}
+              <div className="p-3 bg-[#2a3942]/50 border-t border-white/5 flex items-center justify-center gap-2">
+                <svg className="w-4 h-4 text-white/40" fill="currentColor" viewBox="0 0 20 20">
+                  <path fillRule="evenodd" d="M5 9V7a5 5 0 0110 0v2a2 2 0 012 2v5a2 2 0 01-2 2H5a2 2 0 01-2-2v-5a2 2 0 012-2zm8-2v2H7V7a3 3 0 016 0z" clipRule="evenodd" />
+                </svg>
+                <span className="text-white/40 text-[10px] uppercase tracking-wider font-medium">Transação criptografada pela rede Mercado Pago</span>
+              </div>
+            </div>
+          </div>
+        )}
       </div>
 
       {/* Input Area */}
