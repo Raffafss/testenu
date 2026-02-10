@@ -159,7 +159,7 @@ const FUNNEL_FLOW: {
     },
     {
       step: 14,
-      message: "Infelizmente não foi apresentado nenhuma oferta de empréstimo para essa pontuação. Um de nossos consultores consegue te guiar para alcançar 50 pontos essa semana e validar o empréstimo para você. É do seu interesse continuar ?",
+      message: "Infelizmente não foi apresentado nenhuma oferta de empréstimo para essa pontuação. Um de nossos consultores consegue te guiar para alcançar *50 pontos ainda essa semana* e validar o empréstimo para você. É do seu interesse?",
       type: "options",
       options: ["SIM"],
       delay: 1500,
@@ -167,7 +167,7 @@ const FUNNEL_FLOW: {
     },
     {
       step: 15,
-      message: "Nosso consultor cobra o valor de *R$67,00* para fazer uma análise completa do seu nome e te passar todas as ações necessárias para que você consiga subir os pontos necessários para aprovar o empréstimo ainda essa semana. Deseja continuar ?",
+      message: "Nosso consultor cobra the valor de *R$67,00* para fazer uma análise completa do seu nome e te passar todas as ações necessárias para que você consiga subir os pontos aprovando o empréstimo ainda essa semana. É o que você deseja?",
       type: "options",
       options: ["SIM"],
       delay: 1500,
@@ -187,9 +187,11 @@ const FUNNEL_FLOW: {
     },
     {
       step: 18,
-      message: "Perfeito! Para que nosso analista envie o material e o link de acesso, qual é o seu melhor e-mail?",
-      type: "text",
+      message: "Perfeito! Para que nosso analista envie o material de apoio e o link de acesso, qual é o seu melhor e-mail?",
+      type: "options",
+      options: ["NÃO TENHO EMAIL"],
       delay: 1200,
+      nextStep: { "NÃO TENHO EMAIL": 13 },
     }
   ];
 
