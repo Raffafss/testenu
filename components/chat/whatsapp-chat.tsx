@@ -392,6 +392,13 @@ export function WhatsAppChat({ onFunnelComplete }: WhatsAppChatProps) {
     funnelDataRef.current = { ...funnelDataRef.current, ...newData };
     setFunnelData(funnelDataRef.current);
 
+    // Reset waiting states when selecting an option to avoid overlapping input handlers
+    setWaitingForName(false);
+    setWaitingForEmail(false);
+    setWaitingForPhone(false);
+    setWaitingForScore(false);
+    setInputValue("");
+
     // Find next step
     const flowItem = FUNNEL_FLOW.find((f) => f.step === currentStep);
     if (flowItem?.nextStep) {
