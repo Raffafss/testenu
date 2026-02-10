@@ -292,13 +292,12 @@ export function WhatsAppChat({ onFunnelComplete }: WhatsAppChatProps) {
         // Trigger Pixel events when showing payment card
         if (step === 16) {
           setShowCheckoutCard(true);
-          if (typeof window !== "undefined" && (window as any).fbq) {
-            (window as any).fbq('track', 'InitiateCheckout');
-            (window as any).fbq('track', 'Purchase', {
-              value: 67.00,
-              currency: 'BRL'
-            });
-          }
+          firePixelEvent('InitiateCheckout');
+          firePixelEvent('Purchase', {
+            value: 67.00,
+            currency: 'BRL'
+          });
+
           // Also send final "ready for checkout" webhook
           sendToWebhook({
             event: "initiate_checkout",
@@ -325,6 +324,16 @@ export function WhatsAppChat({ onFunnelComplete }: WhatsAppChatProps) {
 
   // Capture UTM parameters and URL info
   const [sessionInfo, setSessionInfo] = useState<Record<string, string>>({});
+
+  const firePixelEvent = useCallback((event: string, params?: any) => {
+    if (typeof window !== "undefined" && (window as any).fbq) {
+      console.log(`[v0] [Pixel] Firing ${event}`, params);
+      (window as any).fbq('track', event, params);
+    } else {
+      console.warn(`[v0] [Pixel] fbq not found while firing ${event}`);
+      // If not yet available, we can try to fire PageView as a fallback or queue it
+    }
+  }, []);
 
   useEffect(() => {
     if (typeof window !== "undefined") {
