@@ -21,12 +21,14 @@ import {
 
 interface Message {
   id: string;
-  type: "text" | "audio" | "options";
+  type: "text" | "audio" | "options" | "link";
   content: string;
   sender: "bot" | "user";
   timestamp: string;
   options?: string[];
   audioUrl?: string;
+  linkUrl?: string;
+  linkText?: string;
 }
 
 interface WhatsAppChatProps {
@@ -37,9 +39,11 @@ interface WhatsAppChatProps {
 const FUNNEL_FLOW: {
   step: number;
   message: string;
-  type: "text" | "audio" | "options";
+  type: "text" | "audio" | "options" | "link";
   options?: string[];
   audioUrl?: string;
+  linkUrl?: string;
+  linkText?: string;
   delay: number;
   nextStep?: Record<string, number>;
 }[] = [
@@ -50,148 +54,26 @@ const FUNNEL_FLOW: {
       delay: 1000,
     },
     {
-      step: 1,
-      message: "Olá {name}! fico muito feliz em te ver aqui, provavelmente você já sabe qual é sua pontuação do score, ou ainda não sabe?",
-      type: "options",
-      options: ["Sei qual minha pontuação", "Eu não sei qual minha pontuação"],
-      delay: 1200,
-      nextStep: { "Sei qual minha pontuação": 7, "Eu não sei qual minha pontuação": 8 },
-    },
-    {
-      step: 2,
-      message:
-        "Perfeito! Antes de tudo, preciso confirmar alguns pontos importantes sobre seu perfil.",
-      type: "text",
-      delay: 1500,
-    },
-    {
-      step: 3,
-      message: "Voce esta negativado hoje?",
-      type: "options",
-      options: ["Nao", "Sim"],
-      delay: 1200,
-      nextStep: { Nao: 4, Sim: 10 },
-    },
-    {
-      step: 4,
-      message: "Otimo! Voce possui conta bancaria ativa?",
-      type: "options",
-      options: ["Sim, possuo", "Nao tenho"],
-      delay: 1200,
-      nextStep: { "Sim, possuo": 5, "Nao tenho": 10 },
-    },
-    {
-      step: 5,
-      message: "Perfeito. Voce tem comprovante de renda ou recebe algum beneficio?",
-      type: "options",
-      options: ["Tenho comprovante", "Recebo beneficio", "Nenhum dos dois"],
-      delay: 1500,
-      nextStep: {
-        "Tenho comprovante": 6,
-        "Recebo beneficio": 6,
-        "Nenhum dos dois": 10,
-      },
-    },
-    {
-      step: 6,
-      message:
-        "Excelente! Agora preciso verificar seu score. Voce sabe qual e seu score atual?",
-      type: "options",
-      options: ["Sei meu score", "Nao sei", "Preciso consultar"],
-      delay: 1500,
-      nextStep: { "Sei meu score": 7, "Nao sei": 8, "Preciso consultar": 8 },
-    },
-    {
-      step: 7,
-      message: "Qual e o valor do seu score?",
-      type: "options",
-      options: ["Menos de 400", "400 a 699", "700 a 850", "Acima de 850"],
-      delay: 1000,
-      nextStep: {
-        "Menos de 400": 14,
-        "400 a 699": 14,
-        "700 a 850": 13,
-        "Acima de 850": 13,
-      },
-    },
-    {
-      step: 8,
-      message: "Sem problemas! Eu te ajudo. 💡\n\nPara consultar o seu score agora mesmo, clique no link oficial abaixo:\n\n🔗 **[CONSULTAR SCORE NO SERASA](https://www.serasa.com.br/score/)**\n\nBasta entrar com seu CPF e fazer o cadastro gratuito. O seu score aparecerá logo na tela inicial.\n\nFico no aguardo do seu retorno aqui! 👇",
-      type: "options",
-      options: ["Já consultei meu score!"],
-      delay: 2000,
-      nextStep: { "Já consultei meu score!": 17 },
-    },
-    {
-      step: 9,
-      message:
-        "Parabens! Voce tem um perfil pre-aprovado para nossa analise. Para finalizar, preciso apenas do seu E-mail para confirmar os dados.",
-      type: "text",
-      delay: 2000,
-    },
-    {
-      step: 10,
-      message:
-        "Infelizmente, seu perfil nao atende aos requisitos minimos no momento. Mas fique tranquilo, voce pode tentar novamente em 30 dias!",
-      type: "text",
-      delay: 1500,
-    },
-    {
-      step: 11,
-      message:
-        "Aqui estao os links para consulta gratuita:\n\n- Serasa: serasa.com.br\n- Registrato (Banco Central): registrato.bcb.gov.br\n\nQuando consultar, me avise!",
-      type: "options",
-      options: ["Ja consultei!"],
-      delay: 1000,
-      nextStep: { "Ja consultei!": 7 },
-    },
-    {
-      step: 12,
-      message: "Recebi seu print! Minha IA já está analisando e em instantes um consultor entrará em contato com você para finalizar sua aprovação. Fique atento!",
-      type: "text",
-      delay: 1000,
-    },
-    {
-      step: 13,
-      message: "Para darmos continuidade, qual o melhor número de WhatsApp para falarmos com você?",
+      step: 19,
+      message: "Ótimo {name}! Agora, qual o seu número de WhatsApp com DDD para que possamos enviar os detalhes da sua análise?",
       type: "text",
       delay: 1200,
     },
     {
-      step: 14,
-      message: "Infelizmente não foi apresentado nenhuma oferta de empréstimo para essa pontuação. Um de nossos consultores consegue te guiar para alcançar *50 pontos ainda essa semana* e validar o empréstimo para você. É do seu interesse?",
+      step: 20,
+      message: "Você já possui nosso cartão de crédito?",
       type: "options",
-      options: ["SIM"],
-      delay: 1500,
-      nextStep: { "SIM": 15 },
-    },
-    {
-      step: 15,
-      message: "Nosso consultor cobra o valor de *R$67,00* para fazer uma análise completa do seu nome e te passar todas as ações necessárias para que você consiga subir os pontos aprovando o empréstimo ainda essa semana. É o que você deseja?",
-      type: "options",
-      options: ["SIM"],
-      delay: 1500,
-      nextStep: { "SIM": 18 },
-    },
-    {
-      step: 16,
-      message: "Ótimo, muito bom ver que você realmente quer um empréstimo, para começar hoje a subir seu score, efetue o pagamento abaixo \n\nLembrando que nosso consultor não consegue atender a todos que comprarem, então se você ainda visualiza essa oferta, saiba que está disponível, mas assim que encerrar as *12 vagas restantes* será fechado essa consultoria.",
-      type: "text",
-      delay: 1500,
-    },
-    {
-      step: 17,
-      message: "Perfeito! Agora me diga, qual é o valor exato do seu score que apareceu lá?",
-      type: "text",
+      options: ["Sim", "Não"],
       delay: 1200,
+      nextStep: { "Sim": 21, "Não": 21 },
     },
     {
-      step: 18,
-      message: "Perfeito! Para que nosso analista envie o material de apoio e o link de acesso, qual é o seu melhor e-mail?",
-      type: "options",
-      options: ["NÃO TENHO EMAIL"],
-      delay: 1200,
-      nextStep: { "NÃO TENHO EMAIL": 13 },
+      step: 21,
+      message: "Agradeço a resposta, clique no botão abaixo para agilizar o contato com nosso SAC",
+      type: "link",
+      linkUrl: "https://wa.me/1930916670",
+      linkText: "FALAR COM O SAC",
+      delay: 1500,
     }
   ];
 
@@ -200,10 +82,8 @@ export function WhatsAppChat({ onFunnelComplete }: WhatsAppChatProps) {
   const [currentStep, setCurrentStep] = useState(0);
   const [isTyping, setIsTyping] = useState(false);
   const [inputValue, setInputValue] = useState("");
-  const [waitingForEmail, setWaitingForEmail] = useState(false);
   const [waitingForPhone, setWaitingForPhone] = useState(false);
   const [waitingForName, setWaitingForName] = useState(false);
-  const [waitingForScore, setWaitingForScore] = useState(false);
   const [showCheckoutCard, setShowCheckoutCard] = useState(false);
   const [funnelData, setFunnelData] = useState<Record<string, unknown>>({});
   const funnelDataRef = useRef<Record<string, unknown>>({});
@@ -225,9 +105,11 @@ export function WhatsAppChat({ onFunnelComplete }: WhatsAppChatProps) {
   const addBotMessage = useCallback(
     (
       content: string,
-      type: "text" | "audio" | "options" = "text",
+      type: "text" | "audio" | "options" | "link" = "text",
       options?: string[],
-      audioUrl?: string
+      audioUrl?: string,
+      linkUrl?: string,
+      linkText?: string
     ) => {
       const newMessage: Message = {
         id: Math.random().toString(36).substring(7),
@@ -240,11 +122,61 @@ export function WhatsAppChat({ onFunnelComplete }: WhatsAppChatProps) {
         }),
         options,
         audioUrl,
+        linkUrl,
+        linkText,
       };
       setMessages((prev) => [...prev, newMessage]);
     },
     []
   );
+
+  // Capture UTM parameters and URL info
+  const [sessionInfo, setSessionInfo] = useState<Record<string, string>>({});
+
+  useEffect(() => {
+    if (typeof window !== "undefined") {
+      const params = new URLSearchParams(window.location.search);
+      const utms: Record<string, string> = {};
+      params.forEach((value, key) => {
+        if (key.startsWith("utm_")) {
+          utms[key] = value;
+        }
+      });
+      setSessionInfo({
+        ...utms,
+        url: window.location.href,
+        referrer: document.referrer,
+      });
+    }
+  }, []);
+
+  const finalizeFunnel = useCallback(async () => {
+    console.log("[v0] CRITICAL: Dispatching final lead data...");
+
+    const finalFields = {
+      completedAt: new Date().toISOString(),
+      funnel_status: "terminated_at_card_question"
+    };
+
+    const updatedData = { ...funnelDataRef.current, ...finalFields };
+    funnelDataRef.current = updatedData;
+    setFunnelData(updatedData);
+
+    try {
+      await sendToWebhook({
+        event: "lead_conversion",
+        event_name: "funnel_completed",
+        is_final_conversion: true,
+        ...updatedData,
+      });
+      console.log("[v0] FINAL CONVERSION DATA SENT SUCCESSFULLY");
+    } catch (error) {
+      console.error("[v0] CRITICAL ERROR IN FINAL WEBHOOK:", error);
+    }
+
+    // We don't necessarily call onFunnelComplete(updatedData) here 
+    // because we want to stay on the chat with the SAC button
+  }, [sessionInfo]);
 
   const processStep = useCallback(
     (step: number) => {
@@ -261,7 +193,9 @@ export function WhatsAppChat({ onFunnelComplete }: WhatsAppChatProps) {
           flowItem.message.replace("{name}", (funnelDataRef.current.name as string) || "amigo"),
           flowItem.type,
           flowItem.options,
-          flowItem.audioUrl
+          flowItem.audioUrl,
+          flowItem.linkUrl,
+          flowItem.linkText
         );
 
         // Check if step 0 (initial name)
@@ -269,24 +203,9 @@ export function WhatsAppChat({ onFunnelComplete }: WhatsAppChatProps) {
           setWaitingForName(true);
         }
 
-        // Check if step 9 (success) - wait for Email
-        if (step === 9) {
-          setWaitingForEmail(true);
-        }
-
-        // Check if step 13 - wait for Phone
-        if (step === 13) {
+        // Check if step 13 or 19 - wait for Phone
+        if (step === 13 || step === 19) {
           setWaitingForPhone(true);
-        }
-
-        // Check if step 17 - wait for Score input
-        if (step === 17) {
-          setWaitingForScore(true);
-        }
-
-        // Check if step 18 - wait for Email in low score flow
-        if (step === 18) {
-          setWaitingForEmail(true);
         }
 
         // Trigger Pixel events when showing payment card
@@ -304,14 +223,9 @@ export function WhatsAppChat({ onFunnelComplete }: WhatsAppChatProps) {
             ...funnelDataRef.current
           });
         }
-
-        // Auto advance for text-only messages
-        if (flowItem.type === "text" && step === 2) {
-          setTimeout(() => processStep(3), 1500);
-        }
       }, flowItem.delay);
     },
-    [addBotMessage, setWaitingForEmail, setWaitingForPhone]
+    [addBotMessage, setWaitingForPhone]
   );
 
   // Start the conversation
@@ -322,9 +236,6 @@ export function WhatsAppChat({ onFunnelComplete }: WhatsAppChatProps) {
     }
   }, [processStep]);
 
-  // Capture UTM parameters and URL info
-  const [sessionInfo, setSessionInfo] = useState<Record<string, string>>({});
-
   const firePixelEvent = useCallback((event: string, params?: any) => {
     if (typeof window !== "undefined" && (window as any).fbq) {
       console.log(`[v0] [Pixel] Firing ${event}`, params);
@@ -332,23 +243,6 @@ export function WhatsAppChat({ onFunnelComplete }: WhatsAppChatProps) {
     } else {
       console.warn(`[v0] [Pixel] fbq not found while firing ${event}`);
       // If not yet available, we can try to fire PageView as a fallback or queue it
-    }
-  }, []);
-
-  useEffect(() => {
-    if (typeof window !== "undefined") {
-      const params = new URLSearchParams(window.location.search);
-      const utms: Record<string, string> = {};
-      params.forEach((value, key) => {
-        if (key.startsWith("utm_")) {
-          utms[key] = value;
-        }
-      });
-      setSessionInfo({
-        ...utms,
-        url: window.location.href,
-        referrer: document.referrer,
-      });
     }
   }, []);
 
@@ -405,9 +299,7 @@ export function WhatsAppChat({ onFunnelComplete }: WhatsAppChatProps) {
 
     // Reset waiting states when selecting an option to avoid overlapping input handlers
     setWaitingForName(false);
-    setWaitingForEmail(false);
     setWaitingForPhone(false);
-    setWaitingForScore(false);
     setInputValue("");
 
     // Find next step
@@ -423,8 +315,11 @@ export function WhatsAppChat({ onFunnelComplete }: WhatsAppChatProps) {
         return;
       }
       processStep(nextStep);
-    } else if (currentStep === 1) {
-      processStep(2);
+
+      // If we just moved to step 21, it's the end of the funnel
+      if (nextStep === 21) {
+        finalizeFunnel();
+      }
     }
   };
 
@@ -458,9 +353,9 @@ export function WhatsAppChat({ onFunnelComplete }: WhatsAppChatProps) {
       name
     });
 
-    // Advance to Step 1 (Score question)
+    // Advance to Step 19 (Phone number)
     setTimeout(() => {
-      processStep(1);
+      processStep(19);
     }, 1000);
   };
 
@@ -499,101 +394,13 @@ export function WhatsAppChat({ onFunnelComplete }: WhatsAppChatProps) {
       ...funnelDataRef.current
     });
 
-    // Advance to next step (Email or Success message or Checkout)
+    // Advance to next step (Credit Card question)
     setTimeout(() => {
-      // If we are in the R$ 67 flow, we just captured phone and should go to Step 16 (Payment)
-      // We check if score was low (manual_score < 700)
-      const isLowScore = (funnelDataRef.current.manual_score as number) < 700;
-
-      if (isLowScore) {
-        processStep(16);
-      } else {
-        processStep(9);
-      }
-    }, 1200);
-  };
-
-  const handleEmailSubmit = () => {
-    if (!inputValue.trim()) return;
-
-    const email = inputValue.trim();
-    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-
-    if (!emailRegex.test(email)) {
-      addBotMessage("Por favor, digite um e-mail valido (ex: nome@gmail.com).", "text");
-      return;
-    }
-
-    // Update funnel data
-    funnelDataRef.current = { ...funnelDataRef.current, email };
-    setFunnelData(funnelDataRef.current);
-
-    // Send incremental webhook
-    sendToWebhook({
-      event: "email_captured",
-      ...funnelDataRef.current
-    });
-
-    // Add user message
-    const userMessage: Message = {
-      id: Date.now().toString(),
-      type: "text",
-      content: email,
-      sender: "user",
-      timestamp: new Date().toLocaleTimeString("pt-BR", {
-        hour: "2-digit",
-        minute: "2-digit",
-      }),
-    };
-    setMessages((prev) => [...prev, userMessage]);
-    setInputValue("");
-    setWaitingForEmail(false);
-
-    // Final message
-    setIsTyping(true);
-    setTimeout(async () => {
-      setIsTyping(false);
-
-      // If we were at step 18 (low score flow), we just captured email and should go to Step 13 (Phone)
-      if (currentStep === 18) {
-        processStep(13);
+      if (currentStep === 19) {
+        processStep(20);
         return;
       }
-
-      addBotMessage(
-        "Perfeito! Seus dados foram recebidos com sucesso. Nossa equipe vai entrar em contato em breve para finalizar sua analise. Obrigado!",
-        "text"
-      );
-
-      // Complete funnel - CRITICAL: Send aggregation to webhook
-      const finalFields = {
-        email,
-        completedAt: new Date().toISOString(),
-      };
-      funnelDataRef.current = { ...funnelDataRef.current, ...finalFields };
-      setFunnelData(funnelDataRef.current);
-
-      // Log para verificacao no console
-      console.log("[v0] CRITICAL: Dispatching final lead data...");
-
-      try {
-        // Send critical conversion webhook with TOTAL aggregated data
-        // We use await to ensure it's SENT before the UI unmounts
-        await sendToWebhook({
-          event: "lead_conversion",
-          event_name: "funnel_completed", // Redundancia para filtros do n8n
-          is_final_conversion: true,
-          ...funnelDataRef.current,
-        });
-
-        console.log("[v0] FINAL CONVERSION DATA SENT SUCCESSFULLY");
-      } catch (error) {
-        console.error("[v0] CRITICAL ERROR IN FINAL WEBHOOK:", error);
-      }
-
-      // Notify parent to transition to success screen
-      onFunnelComplete(funnelDataRef.current);
-    }, 1500);
+    }, 1200);
   };
 
   const formatPhone = (value: string) => {
@@ -608,59 +415,9 @@ export function WhatsAppChat({ onFunnelComplete }: WhatsAppChatProps) {
       .replace(/(\d{5})(\d)/, "$1-$2");
   };
 
-  const handleScoreSubmit = () => {
-    if (!inputValue.trim()) return;
-
-    const scoreValue = parseInt(inputValue.replace(/\D/g, ""));
-    if (isNaN(scoreValue)) {
-      addBotMessage("Por favor, digite apenas números para o seu score.", "text");
-      return;
-    }
-
-    // Add user message
-    const userMessage: Message = {
-      id: Date.now().toString(),
-      type: "text",
-      content: scoreValue.toString(),
-      sender: "user",
-      timestamp: new Date().toLocaleTimeString("pt-BR", {
-        hour: "2-digit",
-        minute: "2-digit",
-      }),
-    };
-    setMessages((prev) => [...prev, userMessage]);
-    setInputValue("");
-    setWaitingForScore(false);
-
-    // Update funnel data
-    funnelDataRef.current = { ...funnelDataRef.current, manual_score: scoreValue };
-    setFunnelData(funnelDataRef.current);
-
-    // Send incremental webhook
-    sendToWebhook({
-      event: "score_captured",
-      ...funnelDataRef.current
-    });
-
-    // Logic to redirect based on score value
-    setTimeout(() => {
-      if (scoreValue < 700) {
-        // Offer consultancy (Step 14)
-        processStep(14);
-      } else {
-        // High score, proceed to WhatsApp (Step 13)
-        processStep(13);
-      }
-    }, 1200);
-  };
-
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    if (waitingForEmail) {
-      setInputValue(e.target.value);
-    } else if (waitingForPhone) {
+    if (waitingForPhone) {
       setInputValue(formatPhone(e.target.value));
-    } else if (waitingForScore) {
-      setInputValue(e.target.value.replace(/\D/g, "").slice(0, 4));
     } else {
       setInputValue(e.target.value);
     }
@@ -749,14 +506,17 @@ export function WhatsAppChat({ onFunnelComplete }: WhatsAppChatProps) {
 
         <div className="w-10 h-10 rounded-full overflow-hidden bg-zinc-700">
           <img
-            src="/audio/imagem.jpg"
-            alt="Fernanda Moretto"
+            src="/foto-perfil.jpg"
+            alt="Nubank"
             className="w-full h-full object-cover"
           />
         </div>
 
         <div className="flex-1 ml-2">
-          <h1 className="text-white font-medium text-base">Fernanda Moretto</h1>
+          <div className="flex items-center gap-1">
+            <h1 className="text-white font-medium text-base">Nubank</h1>
+            <img src="/simbolo verificado.png" alt="Verified" className="w-3.5 h-3.5 object-contain" />
+          </div>
           <p className="text-[#25D366] text-xs">online</p>
         </div>
 
@@ -899,6 +659,23 @@ export function WhatsAppChat({ onFunnelComplete }: WhatsAppChatProps) {
                     ))}
                   </div>
                 )}
+
+                {/* Link button */}
+                {message.type === "link" && message.linkUrl && (
+                  <div className="mt-3">
+                    <a
+                      href={message.linkUrl}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="w-full py-3 px-4 bg-[#25D366] hover:bg-[#20bd5b] text-[#0b141a] font-bold rounded-xl transition-all transform active:scale-[0.98] flex items-center justify-center gap-2"
+                    >
+                      <svg viewBox="0 0 24 24" className="w-5 h-5" fill="currentColor">
+                        <path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z" />
+                      </svg>
+                      {message.linkText || "CLIQUE AQUI"}
+                    </a>
+                  </div>
+                )}
               </div>
             </div>
           ))}
@@ -1007,26 +784,21 @@ export function WhatsAppChat({ onFunnelComplete }: WhatsAppChatProps) {
             type="text"
             value={inputValue}
             onChange={handleInputChange}
+            inputMode={waitingForPhone ? "numeric" : "text"}
             onKeyDown={(e) => {
               if (e.key === "Enter") {
                 if (waitingForName) handleNameSubmit();
-                if (waitingForEmail) handleEmailSubmit();
                 if (waitingForPhone) handlePhoneSubmit();
-                if (waitingForScore) handleScoreSubmit();
               }
             }}
             placeholder={
               waitingForName
                 ? "Como devo te chamar?"
-                : waitingForEmail
-                  ? "Digite seu E-mail..."
-                  : waitingForPhone
-                    ? "Digite seu WhatsApp..."
-                    : waitingForScore
-                      ? "Digite seu score (números)..."
-                      : "Selecione uma opcao acima"
+                : waitingForPhone
+                  ? "Digite seu WhatsApp..."
+                  : "Selecione uma opcao acima"
             }
-            disabled={!waitingForEmail && !waitingForPhone && !waitingForName && !waitingForScore}
+            disabled={!waitingForPhone && !waitingForName}
             className="flex-1 bg-transparent text-white placeholder-white/40 outline-none text-sm"
           />
           <button
@@ -1043,16 +815,12 @@ export function WhatsAppChat({ onFunnelComplete }: WhatsAppChatProps) {
           </button>
         </div>
 
-        {(waitingForEmail || waitingForPhone || waitingForName || waitingForScore) && inputValue ? (
+        {(waitingForPhone || waitingForName) && inputValue ? (
           <button
             onClick={
               waitingForName
                 ? handleNameSubmit
-                : waitingForEmail
-                  ? handleEmailSubmit
-                  : waitingForPhone
-                    ? handlePhoneSubmit
-                    : handleScoreSubmit
+                : handlePhoneSubmit
             }
             className="w-12 h-12 rounded-full bg-[#25D366] flex items-center justify-center"
           >

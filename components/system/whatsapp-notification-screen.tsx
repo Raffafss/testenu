@@ -105,13 +105,16 @@ export function WhatsAppNotificationScreen({
             <div className="flex items-start gap-3">
               <div className="w-10 h-10 rounded-full overflow-hidden flex-shrink-0 bg-zinc-700">
                 <img
-                  src="/audio/imagem.jpg"
-                  alt="Fernanda Moretto"
+                  src="/foto-perfil.jpg"
+                  alt="Nubank"
                   className="w-full h-full object-cover"
                 />
               </div>
               <div className="flex-1 min-w-0">
-                <p className="text-white font-medium text-sm">Fernanda Moretto</p>
+                <div className="flex items-center gap-1">
+                  <p className="text-white font-medium text-sm">Nubank</p>
+                  <img src="/simbolo verificado.png" alt="Verified" className="w-3 h-3 object-contain" />
+                </div>
                 <p className="text-white/70 text-sm truncate">
                   Oi, vi que voce atendeu a analise. Podemos continuar por aqui?
                 </p>

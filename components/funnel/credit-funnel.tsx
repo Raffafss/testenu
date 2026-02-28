@@ -1,16 +1,12 @@
 "use client";
 
 import { useState, useCallback } from "react";
-import { IncomingCallScreen } from "../system/incoming-call-screen";
-import { ActiveCallScreen } from "../system/active-call-screen";
-import { CallEndedScreen } from "../system/call-ended-screen";
 import { WhatsAppNotificationScreen } from "../system/whatsapp-notification-screen";
 import { WhatsAppChat } from "../chat/whatsapp-chat";
 
-// CAMADA 1: Estados do SISTEMA - Ligacao (fora do funil)
 // CAMADA 2: Estados do SISTEMA - Notificacao WhatsApp (transicao)
 // CAMADA 3: Estados da OPERACAO - Chat WhatsApp (funil real)
-type SystemState = "start" | "incoming" | "active" | "ended" | "notification" | "chat" | "success";
+type SystemState = "notification" | "chat" | "success";
 
 export interface FunnelEvent {
   layer: "SYSTEM" | "NOTIFICATION" | "CHAT";
@@ -20,7 +16,7 @@ export interface FunnelEvent {
 }
 
 export function CreditFunnel() {
-  const [systemState, setSystemState] = useState<SystemState>("incoming");
+  const [systemState, setSystemState] = useState<SystemState>("chat");
   const [events, setEvents] = useState<FunnelEvent[]>([]);
 
   const logEvent = useCallback(
@@ -40,23 +36,6 @@ export function CreditFunnel() {
     },
     []
   );
-
-  // CAMADA 1: Handlers da Ligacao
-  const handleAnswer = useCallback(() => {
-    logEvent("SYSTEM", "CALL_ANSWERED");
-    setSystemState("active");
-  }, [logEvent]);
-
-  const handleDecline = useCallback(() => {
-    logEvent("SYSTEM", "CALL_DECLINED");
-    setSystemState("ended");
-  }, [logEvent]);
-
-  const handleCallComplete = useCallback(() => {
-    logEvent("SYSTEM", "CALL_COMPLETED");
-    // Apos ligacao terminar, vai direto para o chat WhatsApp (liberando o fluxo)
-    setSystemState("chat");
-  }, [logEvent]);
 
   // CAMADA 2: Handler da Notificacao
   const handleNotificationClick = useCallback(() => {
@@ -79,21 +58,11 @@ export function CreditFunnel() {
     [logEvent]
   );
 
-  // CAMADA 1: Tela de ligacao recebida
-  if (systemState === "incoming") {
+  // CAMADA 2: Tela de Notificacao (Lockscreen)
+  if (systemState === "notification") {
     return (
-      <IncomingCallScreen onAnswer={handleAnswer} onDecline={handleDecline} />
+      <WhatsAppNotificationScreen onNotificationClick={handleNotificationClick} />
     );
-  }
-
-  // CAMADA 1: Tela de ligacao recusada
-  if (systemState === "ended") {
-    return <CallEndedScreen />;
-  }
-
-  // CAMADA 1: Tela de ligacao em andamento (audio)
-  if (systemState === "active") {
-    return <ActiveCallScreen onCallComplete={handleCallComplete} />;
   }
 
   // CAMADA 4: Tela de Sucesso Final
