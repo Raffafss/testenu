@@ -75,7 +75,7 @@ const FUNNEL_FLOW: {
     },
     {
       step: 21,
-      message: "Agradeço a resposta, clique no botão abaixo para agilizar o contato com nosso SAC",
+      message: "Ficamos felizes por suas respostas, clique no botão abaixo e conclua com um especialista sua solcitação para lançamentos de seus pontos 💜\n\nLembre-se o banco Nubank nunca solicita senha, dados pessoais ou informações referente ao uso da conta! Caso solicitem, hesite, evite fraudes :)",
       type: "link",
       linkUrl: "https://wa.me/1930916670",
       linkText: "FALAR COM O SAC",
